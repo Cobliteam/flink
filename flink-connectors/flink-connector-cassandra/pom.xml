@@ -30,7 +30,7 @@ under the License.
 		<relativePath>..</relativePath>
 	</parent>
 
-	<artifactId>flink-connector-cassandra_${scala.binary.version}</artifactId>
+	<artifactId>flink-connector-cassandra-shaded_${scala.binary.version}</artifactId>
 	<name>flink-connector-cassandra</name>
 
 	<packaging>jar</packaging>
@@ -83,6 +83,10 @@ under the License.
 										<exclude>com.google.inject.**</exclude>
 									</excludes>
 								</relocation>
+								<relocation>
+ 									<pattern>com.datastax.driver</pattern>
+ 									<shadedPattern>org.apache.flink.cassandra.shaded.com.datastax.driver</shadedPattern>
+ 								</relocation>
 								<!--
 									Relocate to datastax' package where it
 									expects shaded netty versions; see
@@ -97,7 +101,26 @@ under the License.
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-source-plugin</artifactId>
+			    <executions>
+				    <execution>
+						<id>attach-sources</id>
+						<goals>
+								<goal>jar</goal>
+						</goals>
+				    </execution>
+			  	</executions>
+			</plugin>
 		</plugins>
+	    <extensions>
+	        <extension>
+	            <groupId>com.gkatzioura.maven.cloud</groupId>
+	            <artifactId>s3-storage-wagon</artifactId>
+	            <version>2.0</version>
+	        </extension>
+	    </extensions>
 	</build>
 
 	<dependencies>
@@ -217,4 +240,12 @@ under the License.
 			</exclusions>
 		</dependency>
 	</dependencies>
+
+	<distributionManagement>
+	    <repository>
+	    	<uniqueVersion>true</uniqueVersion>
+	        <id>cobli-repo</id>
+	        <url>s3://repo.cobli.co</url>
+	    </repository>
+	</distributionManagement>
 </project>
